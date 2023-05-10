@@ -22,6 +22,16 @@ public class Position {
         && (position.getCol() >= 0 && position.getCol() < border);
   }
 
+  public static boolean isSpawnPositionInTwoRowsAndColsFromSnakePosition(Position spawn,
+      Position snakeHead) {
+
+    int rowCoefficient = snakeHead.getRow() - spawn.getRow();
+    int colCoefficient = snakeHead.getCol() - spawn.getCol();
+
+    return (rowCoefficient == 0 && colCoefficient <= 2)
+        || (colCoefficient == 0 && rowCoefficient <= 2);
+  }
+
   public static Position getNextPositionFromChar(Position fromPosition, char action) {
 
     byte row = fromPosition.row;

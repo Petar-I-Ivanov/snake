@@ -2,13 +2,9 @@ package com.github.snake.models;
 
 import com.github.snake.models.gameboard.Barrier;
 import com.github.snake.models.gameboard.Exit;
-import com.github.snake.models.gameboard.foods.PoisonousFood;
+import com.github.snake.models.gameboard.enemy.Enemy;
 import com.github.snake.models.gameboard.foods.normal.NormalFood;
-import com.github.snake.models.gameboard.foods.special.BorderFood;
-import com.github.snake.models.gameboard.foods.special.GrowthFood;
-import com.github.snake.models.gameboard.foods.special.ImmunityFood;
-import com.github.snake.models.gameboard.poacher.Poacher;
-import com.github.snake.models.gameboard.poacher.Trap;
+import com.github.snake.models.gameboard.foods.special.SpecialFood;
 import com.github.snake.models.gameboard.snake.SnakeBody;
 import com.github.snake.models.gameboard.snake.SnakeHead;
 import jakarta.persistence.Entity;
@@ -45,22 +41,10 @@ public class Game {
   private NormalFood normalFood;
 
   @OneToMany(mappedBy = "game")
-  private List<PoisonousFood> poisonousFoods;
+  private List<SpecialFood> specialFoods;
 
   @OneToMany(mappedBy = "game")
-  private List<BorderFood> borderFoods;
-
-  @OneToMany(mappedBy = "game")
-  private List<GrowthFood> growthFoods;
-
-  @OneToMany(mappedBy = "game")
-  private List<ImmunityFood> immunityFoods;
-
-  @OneToMany(mappedBy = "game")
-  private List<Poacher> poachers;
-
-  @OneToMany(mappedBy = "game")
-  private List<Trap> traps;
+  private List<Enemy> enemies;
 
   @OneToOne(mappedBy = "game")
   private SnakeHead snakeHead;

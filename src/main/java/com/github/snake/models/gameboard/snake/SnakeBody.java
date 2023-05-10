@@ -6,10 +6,12 @@ import com.github.snake.utilities.Constants;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "snake_body")
 public class SnakeBody extends GameboardObject {
 
   @ManyToOne

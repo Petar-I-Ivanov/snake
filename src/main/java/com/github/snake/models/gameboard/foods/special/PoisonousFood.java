@@ -1,7 +1,6 @@
-package com.github.snake.models.gameboard.poacher;
+package com.github.snake.models.gameboard.foods.special;
 
 import com.github.snake.models.Game;
-import com.github.snake.models.gameboard.GameboardObject;
 import com.github.snake.utilities.Constants;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -10,13 +9,13 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Poacher extends GameboardObject {
+public class PoisonousFood extends SpecialFood {
 
   @ManyToOne
   @JoinColumn(name = "game_id")
   private Game game;
 
-  public Poacher() {
-    super(Constants.POACHER_SIGN);
+  public PoisonousFood() {
+    super(Constants.POISONOUS_FOOD_SIGN);
   }
 }

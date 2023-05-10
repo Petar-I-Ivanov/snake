@@ -4,6 +4,10 @@ import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.foods.normal.NormalFood;
 import com.github.snake.models.gameboard.foods.normal.RunningFood;
 import com.github.snake.models.gameboard.foods.normal.StaticFood;
+import com.github.snake.models.gameboard.foods.special.BorderFood;
+import com.github.snake.models.gameboard.foods.special.GrowthFood;
+import com.github.snake.models.gameboard.foods.special.ImmunityFood;
+import com.github.snake.models.gameboard.foods.special.SpecialFood;
 import java.util.Random;
 
 public class RandomGenerator {
@@ -24,6 +28,18 @@ public class RandomGenerator {
       case 1 -> new RunningFood();
 
       default -> throw new IllegalArgumentException("No such normal food.");
+    };
+  }
+
+  public static SpecialFood randomSpecialFood() {
+
+    return switch (randomInt(3)) {
+
+      case 0 -> new BorderFood();
+      case 1 -> new GrowthFood();
+      case 2 -> new ImmunityFood();
+
+      default -> throw new IllegalArgumentException("No such special food.");
     };
   }
 

@@ -3,13 +3,9 @@ package com.github.snake.repositories;
 import com.github.snake.models.gameboard.Barrier;
 import com.github.snake.models.gameboard.Exit;
 import com.github.snake.models.gameboard.GameboardObject;
-import com.github.snake.models.gameboard.foods.PoisonousFood;
+import com.github.snake.models.gameboard.enemy.Enemy;
 import com.github.snake.models.gameboard.foods.normal.NormalFood;
-import com.github.snake.models.gameboard.foods.special.BorderFood;
-import com.github.snake.models.gameboard.foods.special.GrowthFood;
-import com.github.snake.models.gameboard.foods.special.ImmunityFood;
-import com.github.snake.models.gameboard.poacher.Poacher;
-import com.github.snake.models.gameboard.poacher.Trap;
+import com.github.snake.models.gameboard.foods.special.SpecialFood;
 import com.github.snake.models.gameboard.snake.SnakeBody;
 import com.github.snake.models.gameboard.snake.SnakeHead;
 import com.github.snake.utilities.Position;
@@ -28,8 +24,7 @@ public class GameboardObjectRepository {
 
   private static final List<Class<? extends GameboardObject>> ENTITY_CLASSES =
       Arrays.asList(SnakeHead.class, SnakeBody.class, Exit.class, Barrier.class, NormalFood.class,
-          BorderFood.class, GrowthFood.class, ImmunityFood.class, PoisonousFood.class,
-          Poacher.class, Trap.class);
+          SpecialFood.class, Enemy.class);
 
   private EntityManager entityManager;
 

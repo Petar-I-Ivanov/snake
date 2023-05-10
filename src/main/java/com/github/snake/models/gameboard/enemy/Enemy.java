@@ -1,4 +1,4 @@
-package com.github.snake.models.gameboard.foods.normal;
+package com.github.snake.models.gameboard.enemy;
 
 import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.GameboardObject;
@@ -6,8 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,14 +14,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Table(name = "normal_food")
-public class NormalFood extends GameboardObject {
+public class Enemy extends GameboardObject {
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "game_id")
   private Game game;
 
-  protected NormalFood(String sign) {
+  protected Enemy(String sign) {
     super(sign);
   }
 }

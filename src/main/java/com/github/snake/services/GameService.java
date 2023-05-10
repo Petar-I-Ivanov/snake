@@ -1,9 +1,10 @@
 package com.github.snake.services;
 
 import com.github.snake.models.Game;
+import com.github.snake.models.GameStatusEnum;
 import com.github.snake.models.gameboard.GameboardObject;
 import com.github.snake.repositories.GameRepository;
-import com.github.snake.services.food.NormalFoodService;
+import com.github.snake.services.food.FoodService;
 import com.github.snake.utilities.Constants;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -11,19 +12,21 @@ import jakarta.transaction.Transactional;
 @ApplicationScoped
 public class GameService {
 
+  private boolean isIncreased = false;
   private GameRepository gameRepository;
 
   private SnakeService snakeService;
-  private NormalFoodService foodService;
+  private FoodService foodService;
 
   private GameboardObjectsService gameboardObjectsService;
 
   public GameService(GameRepository gameRepository, SnakeService snakeService,
-      NormalFoodService foodService, GameboardObjectsService gameboardObjectsService) {
+      FoodService foodService, GameboardObjectsService gameboardObjectsService) {
 
     this.gameRepository = gameRepository;
     this.snakeService = snakeService;
     this.foodService = foodService;
+    this.snakeService.setFoodService(foodService);
 
     this.gameboardObjectsService = gameboardObjectsService;
   }
@@ -48,7 +51,16 @@ public class GameService {
     Game game = gameRepository.findById(gameId);
 
     snakeService.move(game, action);
-    foodService.addCheck(game);
+    foodService.foodCheck(game);
+
+    if (snakeService.getSnakeSize(gameId) % 5 == 0 && !isIncreased) {
+      game.setStatus(GameStatusEnum.values()[getNextGameStatusIndex(game)]);
+      isIncreased = true;
+    } else {
+      isIncreased = false;
+    }
+
+    game.setTurn((short) (game.getTurn() + 1));
     gameRepository.persistAndFlush(game);
     return game;
   }
@@ -79,5 +91,22 @@ public class GameService {
 
       gameboard[object.getRowLocation()][object.getColLocation()] = object.getSign();
     }
+  }
+
+  private static int getNextGameStatusIndex(Game game) {
+
+    int counter = 0;
+
+    for (GameStatusEnum status : GameStatusEnum.values()) {
+
+      if (game.getStatus() == status) {
+
+        return counter + 1;
+      }
+
+      counter++;
+    }
+
+    throw new IllegalArgumentException("Game's status is invalid.");
   }
 }
