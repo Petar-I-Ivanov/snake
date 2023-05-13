@@ -7,7 +7,7 @@ import com.github.snake.models.gameboard.foods.special.ImmunityFood;
 import com.github.snake.models.gameboard.foods.special.PoisonousFood;
 import com.github.snake.models.gameboard.foods.special.SpecialFood;
 import com.github.snake.repositories.Repository;
-import com.github.snake.services.GameboardObjectsService;
+import com.github.snake.services.GameboardPositionService;
 import com.github.snake.utilities.Position;
 import com.github.snake.utilities.RandomGenerator;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,10 +19,10 @@ public class SpecialFoodService {
   private static final int SPECIAL_FOOD_TURN = 5;
 
   private Repository repository;
-  private GameboardObjectsService gameboardObjectsService;
+  private GameboardPositionService gameboardObjectsService;
 
   public SpecialFoodService(Repository repository,
-      GameboardObjectsService gameboardObjectsService) {
+      GameboardPositionService gameboardObjectsService) {
     this.repository = repository;
     this.gameboardObjectsService = gameboardObjectsService;
   }

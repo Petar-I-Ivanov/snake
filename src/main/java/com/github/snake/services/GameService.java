@@ -18,15 +18,14 @@ public class GameService {
   private SnakeService snakeService;
   private FoodService foodService;
 
-  private GameboardObjectsService gameboardObjectsService;
+  private GameboardPositionService gameboardObjectsService;
 
   public GameService(GameRepository gameRepository, SnakeService snakeService,
-      FoodService foodService, GameboardObjectsService gameboardObjectsService) {
+      FoodService foodService, GameboardPositionService gameboardObjectsService) {
 
     this.gameRepository = gameRepository;
     this.snakeService = snakeService;
     this.foodService = foodService;
-    this.snakeService.setFoodService(foodService);
 
     this.gameboardObjectsService = gameboardObjectsService;
   }
@@ -40,7 +39,7 @@ public class GameService {
     Game game = new Game();
     gameRepository.persistAndFlush(game);
 
-    snakeService.addSnake(game);
+    snakeService.generateSnake(game);
     gameRepository.persistAndFlush(game);
     return game;
   }
@@ -56,8 +55,10 @@ public class GameService {
     if (snakeService.getSnakeSize(gameId) % 5 == 0 && !isIncreased) {
       game.setStatus(GameStatusEnum.values()[getNextGameStatusIndex(game)]);
       isIncreased = true;
-    } else {
-      isIncreased = false;
+    }
+    
+    if (snakeService.getSnakeSize(gameId) % 5 != 0 && isIncreased) {
+    	isIncreased = false;
     }
 
     game.setTurn((short) (game.getTurn() + 1));

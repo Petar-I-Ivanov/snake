@@ -3,7 +3,7 @@ package com.github.snake.services.food;
 import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.foods.normal.NormalFood;
 import com.github.snake.repositories.Repository;
-import com.github.snake.services.GameboardObjectsService;
+import com.github.snake.services.GameboardPositionService;
 import com.github.snake.utilities.Constants;
 import com.github.snake.utilities.Position;
 import com.github.snake.utilities.RandomGenerator;
@@ -13,9 +13,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class NormalFoodService {
 
   private Repository repository;
-  private GameboardObjectsService gameboardObjectsService;
+  private GameboardPositionService gameboardObjectsService;
 
-  public NormalFoodService(Repository repository, GameboardObjectsService gameboardObjectsService) {
+  public NormalFoodService(Repository repository, GameboardPositionService gameboardObjectsService) {
 
     this.repository = repository;
     this.gameboardObjectsService = gameboardObjectsService;

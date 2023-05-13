@@ -4,7 +4,6 @@ import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.snake.SnakeBody;
 import com.github.snake.models.gameboard.snake.SnakeHead;
 import com.github.snake.repositories.Repository;
-import com.github.snake.services.food.FoodService;
 import com.github.snake.utilities.Position;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -12,107 +11,128 @@ import java.util.List;
 @ApplicationScoped
 public class SnakeService {
 
-  private Repository repository;
-  private FoodService foodService;
+	private Repository repository;
+	private GameboardPositionService positionService;
 
-  public SnakeService(Repository repository) {
-    this.repository = repository;
-  }
+	public SnakeService(Repository repository, GameboardPositionService positionService) {
+		this.repository = repository;
+		this.positionService = positionService;
+	}
 
-  public void setFoodService(FoodService foodService) {
-    this.foodService = foodService;
-  }
+	public Position getSnakeHeadLocation(Long gameId) {
+		return repository.findSingleByGameId(gameId, SnakeHead.class).getLocation();
+	}
 
-  public Position getSnakeHeadLocation(Long gameId) {
-    return repository.findSingleByGameId(gameId, SnakeHead.class).getLocation();
-  }
+	public int getSnakeSize(Long gameId) {
+		return repository.findListByGameId(gameId, SnakeBody.class).size() + 1;
+	}
 
-  public int getSnakeSize(Long gameId) {
-    return repository.findListByGameId(gameId, SnakeBody.class).size() + 1;
-  }
+	public void generateSnake(Game game) {
 
-  public void addSnake(Game game) {
+		SnakeHead snakeHead = new SnakeHead();
+		snakeHead.setGame(game);
+		repository.save(snakeHead);
 
-    SnakeHead snakeHead = new SnakeHead();
-    snakeHead.setGame(game);
-    repository.save(snakeHead);
+		game.setSnakeHead(snakeHead);
+	}
 
-    game.setSnakeHead(snakeHead);
-  }
+	// TODO: simpify this method
+	public void move(Game game, char action) {
 
-  public void move(Game game, char action) {
+		SnakeHead head = repository.findSingleByGameId(game.getId(), SnakeHead.class);
+		List<SnakeBody> bodies = repository.findListByGameId(game.getId(), SnakeBody.class);
+		Long gameId = game.getId();
 
-    SnakeHead head = repository.findSingleByGameId(game.getId(), SnakeHead.class);
-    List<SnakeBody> bodies = repository.findListByGameId(game.getId(), SnakeBody.class);
+		Position nextPosition = Position.getNextPositionFromChar(head.getLocation(), action);
 
-    Position nextPosition = Position.getNextPositionFromChar(head.getLocation(), action);
+		if (!Position.isPositionInBorders(game, nextPosition)) {
+			throw new IllegalArgumentException("Next position is outside the borders.");
+		}
 
-    if (!Position.isPositionInBorders(game, nextPosition)) {
-      throw new IllegalArgumentException("Next position is outside the borders.");
-    }
+		if (!positionService.isPositionOccupied(gameId, nextPosition)) {
+			moveAndReturnLastPosition(head, bodies, nextPosition);
+			repository.save(head);
+			repository.save(bodies);
+			return;
+		}
 
-    if (nextPositionObjectCheck(game.getId(), nextPosition, head)) {
+		if (positionService.isPositionNormalFood(gameId, nextPosition)) {
 
-      Position lastPosition = moveAndReturnLastPosition(head, bodies, nextPosition);
-      foodService.eatFoodAtPosition(game.getId(), nextPosition);
+			positionService.eatNormalFood(gameId, nextPosition);
+			Position lastPosition = moveAndReturnLastPosition(head, bodies, nextPosition);
 
-      SnakeBody body = new SnakeBody();
-      body.setLocation(lastPosition);
-      body.setGame(game);
-      bodies.add(body);
+			SnakeBody body = new SnakeBody();
+			body.setLocation(lastPosition);
+			body.setGame(game);
+			bodies.add(body);
 
-      repository.save(head);
-      repository.save(bodies);
-      return;
-    }
+			repository.save(head);
+			repository.save(bodies);
+			return;
+		}
 
-    moveAndReturnLastPosition(head, bodies, nextPosition);
-  }
+		if (positionService.isPositionPoisonousFood(gameId, nextPosition)) {
+			head.setPoisonousFoodActive(true);
+			positionService.eatSpecialFood(gameId, nextPosition);
+			moveAndReturnLastPosition(head, bodies, nextPosition);
+			repository.save(head);
+			repository.save(bodies);
+			return;
+		}
 
-  private static Position moveAndReturnLastPosition(SnakeHead head, List<SnakeBody> bodies,
-      Position position) {
+		if (positionService.isPositionBorderFood(gameId, nextPosition)) {
+			head.setBorderFoodActive(true);
+			positionService.eatSpecialFood(gameId, nextPosition);
+			moveAndReturnLastPosition(head, bodies, nextPosition);
+			repository.save(head);
+			repository.save(bodies);
+			return;
+		}
 
-    Position temp = head.getLocation();
-    head.setLocation(position);
-    position = temp;
+		if (positionService.isPositionGrowthFood(gameId, nextPosition)) {
+			head.setGrowthFoodActive(true);
+			positionService.eatSpecialFood(gameId, nextPosition);
+			moveAndReturnLastPosition(head, bodies, nextPosition);
+			repository.save(head);
+			repository.save(bodies);
+			return;
+		}
 
-    for (SnakeBody body : bodies) {
+		if (positionService.isPositionImmunityFood(gameId, nextPosition)) {
+			head.setImmunityFoodActive(true);
+			positionService.eatSpecialFood(gameId, nextPosition);
+			moveAndReturnLastPosition(head, bodies, nextPosition);
+			repository.save(head);
+			repository.save(bodies);
+			return;
+		}
+		
+		if (positionService.isPositionEnemy(gameId, nextPosition)) {
+			head.setKilled(true);
+			repository.save(head);
+			return;
+		}
+		
+		if (positionService.isPositionEnemy(gameId, nextPosition)) {
+			head.setEscaped(true);
+			repository.save(head);
+			return;
+		}
+	}
 
-      temp = body.getLocation();
-      body.setLocation(position);
-      position = temp;
-    }
+	private static Position moveAndReturnLastPosition(SnakeHead head, List<SnakeBody> bodies, Position position) {
 
-    return position;
-  }
+		Position temp = head.getLocation();
+		head.setLocation(position);
+		position = temp;
 
-  private boolean nextPositionObjectCheck(Long gameId, Position nextPosition, SnakeHead snakeHead) {
+		for (SnakeBody body : bodies) {
 
-    if (foodService.isPositionNormalFood(gameId, nextPosition)) {
-      return true;
-    }
+			temp = body.getLocation();
+			body.setLocation(position);
+			position = temp;
+		}
 
-    if (foodService.isPositionPoisonousFood(gameId, nextPosition)) {
-      snakeHead.setPoisonousFoodActive(true);
-      foodService.eatFoodAtPosition(gameId, nextPosition);
-    }
-
-    if (foodService.isPositionBorderFood(gameId, nextPosition)) {
-      snakeHead.setBorderFoodActive(true);
-      foodService.eatFoodAtPosition(gameId, nextPosition);
-
-    }
-
-    if (foodService.isPositionGrowthFood(gameId, nextPosition)) {
-      snakeHead.setGrowthFoodActive(true);
-      foodService.eatFoodAtPosition(gameId, nextPosition);
-    }
-
-    if (foodService.isPositionImmunityFood(gameId, nextPosition)) {
-      snakeHead.setImmunityFoodActive(true);
-      foodService.eatFoodAtPosition(gameId, nextPosition);
-    }
-
-    return false;
-  }
+		return position;
+	}
 }
