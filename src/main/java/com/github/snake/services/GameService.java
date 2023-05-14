@@ -13,19 +13,19 @@ import jakarta.transaction.Transactional;
 @ApplicationScoped
 public class GameService {
 
-  private boolean isIncreased = false;
   private GameRepository gameRepository;
 
   private SnakeService snakeService;
   private FoodService foodService;
   private EnemyService enemyService;
   private BarrierService barrierService;
+  private ExitService exitService;
 
   private GameboardPositionService gameboardObjectsService;
 
   public GameService(GameRepository gameRepository, SnakeService snakeService,
       FoodService foodService, EnemyService enemyService,
-      BarrierService barrierService,
+      BarrierService barrierService, ExitService exitService,
       GameboardPositionService gameboardObjectsService) {
 
     this.gameRepository = gameRepository;
@@ -33,6 +33,7 @@ public class GameService {
     this.foodService = foodService;
     this.enemyService = enemyService;
     this.barrierService = barrierService;
+    this.exitService = exitService;
 
     this.gameboardObjectsService = gameboardObjectsService;
   }
@@ -60,16 +61,17 @@ public class GameService {
     foodService.foodCheck(game);
     enemyService.turnActionAndChecks(game);
 
-    if (snakeService.getSnakeSize(gameId) % 5 == 0 && !isIncreased) {
-      game.setStatus(GameStatusEnum.values()[getNextGameStatusIndex(game)]);
+    if (isGameIncreasing(game)) {
+    	
       gameboardObjectsService.moveAllWithOneRowAndCol(gameId);
       enemyService.generatePoacher(game);
       barrierService.generateBarrier(game);
-      isIncreased = true;
     }
     
-    if (snakeService.getSnakeSize(gameId) % 5 != 0 && isIncreased) {
-    	isIncreased = false;
+    if (snakeService.isSnakeEscaped(gameId) || snakeService.isSnakeKilled(gameId)) {
+    	
+    	GameStatusEnum status = snakeService.isSnakeEscaped(gameId) ? GameStatusEnum.WON : GameStatusEnum.LOST;
+    	game.setStatus(status);
     }
 
     game.setTurn((short) (game.getTurn() + 1));
@@ -104,21 +106,37 @@ public class GameService {
       gameboard[object.getRowLocation()][object.getColLocation()] = object.getSign();
     }
   }
-
-  private static int getNextGameStatusIndex(Game game) {
-
-    int counter = 0;
-
-    for (GameStatusEnum status : GameStatusEnum.values()) {
-
-      if (game.getStatus() == status) {
-
-        return counter + 1;
-      }
-
-      counter++;
-    }
-
-    throw new IllegalArgumentException("Game's status is invalid.");
+  
+  private boolean isGameIncreasing(Game game) {
+	  
+	  int snakeSize = snakeService.getSnakeSize(game.getId());
+	  
+	  if (game.getStatus() == GameStatusEnum.LEVEL_ONE && snakeSize >= 5) {
+		  game.setStatus(GameStatusEnum.LEVEL_TWO);
+		  return true;
+	  }
+	  
+	  if (game.getStatus() == GameStatusEnum.LEVEL_TWO && snakeSize >= 10) {
+		  game.setStatus(GameStatusEnum.LEVEL_THREE);
+		  return true;
+	  }
+	  
+	  if (game.getStatus() == GameStatusEnum.LEVEL_THREE && snakeSize >= 15) {
+		  game.setStatus(GameStatusEnum.LEVEL_FOUR);
+		  return true;
+	  }
+	  
+	  if (game.getStatus() == GameStatusEnum.LEVEL_FOUR && snakeSize >= 20) {
+		  game.setStatus(GameStatusEnum.LEVEL_FIVE);
+		  return true;
+	  }
+	  
+	  if (game.getStatus() == GameStatusEnum.LEVEL_FIVE && snakeSize >= 25) {
+		  game.setStatus(GameStatusEnum.LEVEL_SIX);
+		  exitService.generateExit(game);
+		  return true;
+	  }
+	  
+	  return false;
   }
 }

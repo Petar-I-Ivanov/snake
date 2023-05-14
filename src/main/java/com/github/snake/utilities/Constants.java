@@ -13,22 +13,22 @@ public class Constants {
   public static final byte LEVEL_FIVE_ROW_COL = 13;
   public static final byte LEVEL_SIX_ROW_COL = 15;
 
-  public static final String SNAKE_HEAD_SIGN = "@";
-  public static final String SNAKE_BODY_SIGN = "+";
+  public static final String SNAKE_HEAD_SIGN = "H";
+  public static final String SNAKE_BODY_SIGN = "B";
 
   public static final String NORMAL_STATIC_FOOD_SIGN = "O";
   public static final String NORMAL_RUNNING_FOOD_SIGN = "R";
 
-  public static final String SPECIAL_BORDER_FOOD_SIGN = "%";
-  public static final String SPECIAL_GROWTH_FOOD_SIGN = "$";
-  public static final String SPECIAL_IMMUNITY_FOOD_SIGN = "&";
+  public static final String SPECIAL_BORDER_FOOD_SIGN = "Q";
+  public static final String SPECIAL_GROWTH_FOOD_SIGN = "W";
+  public static final String SPECIAL_IMMUNITY_FOOD_SIGN = "U";
 
   public static final String POISONOUS_FOOD_SIGN = "O";
 
   public static final String POACHER_SIGN = "P";
   public static final String TRAP_SIGN = "T";
 
-  public static final String BARRIER_SIGN = "#";
+  public static final String BARRIER_SIGN = "Y";
   public static final String EXIT_SIGN = "E";
 
   public static final String EMPTY_SPACE_SIGN = "X";

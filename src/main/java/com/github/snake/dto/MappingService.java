@@ -1,6 +1,7 @@
 package com.github.snake.dto;
 
 import com.github.snake.models.Game;
+import com.github.snake.models.GameStatusEnum;
 import com.github.snake.services.GameService;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -32,7 +33,10 @@ public class MappingService {
     dto.setId(game.getId());
     dto.setStatus(game.getStatus());
     dto.setTurn(game.getTurn());
-    dto.setMap(gameService.getGameboard(game.getId()));
+    
+    if (game.getStatus() != GameStatusEnum.WON && game.getStatus() != GameStatusEnum.LOST) {
+    	dto.setMap(gameService.getGameboard(game.getId()));
+    }
 
     return dto;
   }

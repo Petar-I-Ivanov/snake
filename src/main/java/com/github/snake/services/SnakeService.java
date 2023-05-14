@@ -26,6 +26,14 @@ public class SnakeService {
 	public int getSnakeSize(Long gameId) {
 		return repository.findListByGameId(gameId, SnakeBody.class).size() + 1;
 	}
+	
+	public boolean isSnakeKilled(Long gameId) {
+		return repository.findSingleByGameId(gameId, SnakeHead.class).isKilled();
+	}
+	
+	public boolean isSnakeEscaped(Long gameId) {
+		return repository.findSingleByGameId(gameId, SnakeHead.class).isEscaped();
+	}
 
 	public void generateSnake(Game game) {
 
@@ -45,11 +53,16 @@ public class SnakeService {
 
 		Position nextPosition = Position.getNextPositionFromChar(head.getLocation(), action);
 
-		if (!Position.isPositionInBorders(game, nextPosition)) {
+		if (!Position.isPositionInBorders(game, nextPosition) && !head.isBorderFoodActive()) {
 			throw new IllegalArgumentException("Next position is outside the borders.");
 		}
-		
+
+		if (head.isBorderFoodActive()) {
+			head.setBorderFoodActive(false);
+		}
+
 		if (!positionService.isPositionOccupied(gameId, nextPosition)) {
+
 			moveAndReturnLastPosition(head, bodies, nextPosition);
 			repository.save(head);
 			repository.save(bodies);
@@ -61,10 +74,29 @@ public class SnakeService {
 			positionService.eatNormalFood(gameId, nextPosition);
 			Position lastPosition = moveAndReturnLastPosition(head, bodies, nextPosition);
 
-			SnakeBody body = new SnakeBody();
-			body.setLocation(lastPosition);
-			body.setGame(game);
-			bodies.add(body);
+			if (!head.isPoisonousFoodActive()) {
+
+				SnakeBody body = new SnakeBody();
+				body.setLocation(lastPosition);
+				body.setGame(game);
+				bodies.add(body);
+			}
+
+			if (head.isGrowthFoodActive()) {
+
+				for (int row = nextPosition.getRow() - 1; row < nextPosition.getRow() + 1; row++) {
+					for (int col = nextPosition.getCol() - 1; col < nextPosition.getCol() + 1; col++) {
+						if (!positionService.isPositionOccupied(gameId, lastPosition)) {
+
+							SnakeBody secondBody = new SnakeBody();
+							secondBody.setLocation(new Position(row, col));
+							secondBody.setGame(game);
+							bodies.add(secondBody);
+							break;
+						}
+					}
+				}
+			}
 
 			repository.save(head);
 			repository.save(bodies);
@@ -72,9 +104,21 @@ public class SnakeService {
 		}
 
 		if (positionService.isPositionPoisonousFood(gameId, nextPosition)) {
-			head.setPoisonousFoodActive(true);
+
 			positionService.eatSpecialFood(gameId, nextPosition);
 			moveAndReturnLastPosition(head, bodies, nextPosition);
+
+			if (!head.isImmunityFoodActive()) {
+
+				if (bodies.size() == 0) {
+					head.setPoisonousFoodActive(true);
+				} else {
+					repository.delete(bodies.get(bodies.size() - 1));
+				}
+			} else {
+				head.setImmunityFoodActive(false);
+			}
+
 			repository.save(head);
 			repository.save(bodies);
 			return;
@@ -106,13 +150,13 @@ public class SnakeService {
 			repository.save(bodies);
 			return;
 		}
-		
+
 		if (positionService.isPositionEnemy(gameId, nextPosition)) {
 			head.setKilled(true);
 			repository.save(head);
 			return;
 		}
-		
+
 		if (positionService.isPositionEnemy(gameId, nextPosition)) {
 			head.setEscaped(true);
 			repository.save(head);
