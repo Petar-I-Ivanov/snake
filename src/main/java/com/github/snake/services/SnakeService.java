@@ -48,7 +48,7 @@ public class SnakeService {
 		if (!Position.isPositionInBorders(game, nextPosition)) {
 			throw new IllegalArgumentException("Next position is outside the borders.");
 		}
-
+		
 		if (!positionService.isPositionOccupied(gameId, nextPosition)) {
 			moveAndReturnLastPosition(head, bodies, nextPosition);
 			repository.save(head);

@@ -4,6 +4,7 @@ import com.github.snake.models.Game;
 import com.github.snake.models.GameStatusEnum;
 import com.github.snake.models.gameboard.GameboardObject;
 import com.github.snake.repositories.GameRepository;
+import com.github.snake.services.enemy.EnemyService;
 import com.github.snake.services.food.FoodService;
 import com.github.snake.utilities.Constants;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -17,15 +18,21 @@ public class GameService {
 
   private SnakeService snakeService;
   private FoodService foodService;
+  private EnemyService enemyService;
+  private BarrierService barrierService;
 
   private GameboardPositionService gameboardObjectsService;
 
   public GameService(GameRepository gameRepository, SnakeService snakeService,
-      FoodService foodService, GameboardPositionService gameboardObjectsService) {
+      FoodService foodService, EnemyService enemyService,
+      BarrierService barrierService,
+      GameboardPositionService gameboardObjectsService) {
 
     this.gameRepository = gameRepository;
     this.snakeService = snakeService;
     this.foodService = foodService;
+    this.enemyService = enemyService;
+    this.barrierService = barrierService;
 
     this.gameboardObjectsService = gameboardObjectsService;
   }
@@ -51,9 +58,13 @@ public class GameService {
 
     snakeService.move(game, action);
     foodService.foodCheck(game);
+    enemyService.turnActionAndChecks(game);
 
     if (snakeService.getSnakeSize(gameId) % 5 == 0 && !isIncreased) {
       game.setStatus(GameStatusEnum.values()[getNextGameStatusIndex(game)]);
+      gameboardObjectsService.moveAllWithOneRowAndCol(gameId);
+      enemyService.generatePoacher(game);
+      barrierService.generateBarrier(game);
       isIncreased = true;
     }
     

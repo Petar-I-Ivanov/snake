@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Enemy extends GameboardObject {
 
   @ManyToOne
   @JoinColumn(name = "game_id")
-  private Game game;
+  protected Game game;
 
   protected Enemy(String sign) {
     super(sign);

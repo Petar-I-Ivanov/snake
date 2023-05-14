@@ -19,6 +19,10 @@ public class RandomGenerator {
   public static int randomInt(int border) {
     return random.nextInt(border);
   }
+  
+  public static boolean isTwentyFivePercentChanceSuccessful() {
+	  return randomInt(4) == 1;
+  }
 
   public static NormalFood randomNormalFood() {
 
@@ -70,5 +74,18 @@ public class RandomGenerator {
     return newPosition;
   }
 
-
+  public static Position randomCornerPosition(Game game) {
+	  
+	  int border = Constants.getGameboardRowCol(game);
+	  
+	  return switch (randomInt(4)) {
+	  
+	  case 0 -> new Position(0, 0);
+	  case 1 -> new Position(0, border - 1);
+	  case 2 -> new Position(border - 1, 0);
+	  case 3 -> new Position(border - 1, border - 1);
+	  
+	  default -> throw new IllegalArgumentException("Random corner generator out of corners.");
+	  };
+  }
 }
