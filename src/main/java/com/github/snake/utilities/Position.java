@@ -32,6 +32,14 @@ public class Position {
         || (colCoefficient == 0 && rowCoefficient <= 2);
   }
 
+  public static boolean arePositionsInlineAndAround(Position positionOne, Position positionTwo) {
+
+    int rowDifference = Math.abs(positionOne.row - positionTwo.row);
+    int colDifference = Math.abs(positionOne.col - positionTwo.col);
+
+    return (rowDifference == 1 && colDifference == 0) || (rowDifference == 0 && colDifference == 1);
+  }
+
   public static Position getNextPositionFromChar(Position fromPosition, char action) {
 
     byte row = fromPosition.row;

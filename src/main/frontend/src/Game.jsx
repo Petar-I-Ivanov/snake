@@ -1,10 +1,12 @@
 import { createEffect, createSignal } from "solid-js";
-import { useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import RenderGame from "./RenderGame";
 
 const Game = () => {
 
   const { gameId } = useParams();
+  const navigate = useNavigate();
+
   const [game, setGame] = createSignal({
     status: "",
     turn: 0,
@@ -36,6 +38,11 @@ const Game = () => {
     const json = await response.json();
 
     if (response.status === 200) {
+
+      if (json.status === "WON" || json.status === "LOST") {
+        navigate(`/result/${gameId}`);
+      }
+
       setGame(json);
       setError(null);
     }

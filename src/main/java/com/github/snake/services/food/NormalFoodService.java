@@ -3,7 +3,7 @@ package com.github.snake.services.food;
 import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.foods.normal.NormalFood;
 import com.github.snake.repositories.Repository;
-import com.github.snake.services.GameboardPositionService;
+import com.github.snake.services.RandomPositionGeneratorService;
 import com.github.snake.utilities.Constants;
 import com.github.snake.utilities.Position;
 import com.github.snake.utilities.RandomGenerator;
@@ -13,39 +13,28 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class NormalFoodService {
 
   private Repository repository;
-  private GameboardPositionService gameboardObjectsService;
+  private RandomPositionGeneratorService randomPositionService;
 
-  public NormalFoodService(Repository repository, GameboardPositionService gameboardObjectsService) {
+  public NormalFoodService(Repository repository,
+      RandomPositionGeneratorService randomPositionService) {
 
     this.repository = repository;
-    this.gameboardObjectsService = gameboardObjectsService;
+    this.randomPositionService = randomPositionService;
   }
 
-  public boolean isPositionNormalFood(Long gameId, Position position) {
-
-    NormalFood food = repository.findSingleByGameId(gameId, NormalFood.class);
-    return food != null && food.getLocation().equals(position);
-  }
-
-  public void normalFoodCheck(Game game, Position snakeHeadLocation) {
+  public void normalFoodCheck(Game game) {
 
     NormalFood food = repository.findSingleByGameId(game.getId(), NormalFood.class);
 
     if (food == null) {
-
-      food = getNewNormalFood(game, snakeHeadLocation);
-      food.setGame(game);
-      repository.save(food);
-
-      game.setNormalFood(food);
+      generateNewNormalFood(game);
       return;
     }
 
     if (isNormalFoodRunning(food)) {
-
-      Position movePosition = getMoveFoodPosition(game, food.getLocation());
-      food.setLocation(movePosition);
+      moveRunningFood(game, food);
     }
+
   }
 
   public void eatFoodAtPosition(Long gameId, Position position) {
@@ -57,41 +46,32 @@ public class NormalFoodService {
     }
   }
 
-  private NormalFood getNewNormalFood(Game game, Position snakeHeadPosition) {
+  private void generateNewNormalFood(Game game) {
 
-    NormalFood food = RandomGenerator.randomNormalFood();
-    Position position = getSpawnFoodPosition(game, snakeHeadPosition);
-    food.setLocation(position);
-    return food;
+    Position position = randomPositionService.getRandomSpawnFoodPosition(game);
+
+    if (position != null) {
+
+      NormalFood food = RandomGenerator.randomNormalFood();
+
+      food.setLocation(position);
+      food.setGame(game);
+
+      repository.save(food);
+      game.setNormalFood(food);
+    }
   }
 
-  private Position getSpawnFoodPosition(Game game, Position snakeHeadPosition) {
+  private void moveRunningFood(Game game, NormalFood food) {
 
-    Position spawnPositon;
+    Position movePosition =
+        randomPositionService.getRandomFreePositionAround(game, food.getLocation());
 
-    do {
-      spawnPositon = RandomGenerator.randomPositionInBorders(game);
-    } while (isPositionUnavailableToSpawn(game.getId(), spawnPositon, snakeHeadPosition));
+    if (movePosition != null) {
 
-    return spawnPositon;
-  }
-
-  private boolean isPositionUnavailableToSpawn(Long gameId, Position spawnPosition,
-      Position snakeHeadPosition) {
-
-    return Position.isSpawnPositionInTwoRowsAndColsFromSnakePosition(spawnPosition,
-        snakeHeadPosition) || gameboardObjectsService.isPositionOccupied(gameId, spawnPosition);
-  }
-
-  private Position getMoveFoodPosition(Game game, Position nearPosition) {
-
-    Position movePosition;
-
-    do {
-      movePosition = RandomGenerator.randomNearPosition(game, nearPosition);
-    } while (gameboardObjectsService.isPositionOccupied(game.getId(), movePosition));
-
-    return movePosition;
+      food.setLocation(movePosition);
+      repository.save(food);
+    }
   }
 
   private static boolean isNormalFoodRunning(NormalFood food) {

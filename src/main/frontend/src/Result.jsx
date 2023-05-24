@@ -13,6 +13,7 @@ function Result() {
           const response = await fetch(`http://localhost:8080/game/${gameId}`);
           const json = await response.json();
           setGame(json);
+          console.log(json);
         };
     
         fetchGame();
@@ -33,7 +34,7 @@ function Result() {
       
       return (
         <div>
-            <h1>You {game.status == WON ? 'WON' : 'LOST'} the game</h1>
+            <h1>You {game.status === "WON" ? "WON" : "LOST"} the game</h1>
             <button onClick={goBack}>Go back</button>
             <button onClick={startNewGame}>Start New Game</button>
         </div>
