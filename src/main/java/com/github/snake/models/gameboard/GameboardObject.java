@@ -6,8 +6,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @NoArgsConstructor
 @MappedSuperclass
 public class GameboardObject {
@@ -43,25 +45,5 @@ public class GameboardObject {
 
     this.rowLocation = location.getRow();
     this.colLocation = location.getCol();
-  }
-
-  public byte getRowLocation() {
-    return this.rowLocation;
-  }
-
-  public byte getColLocation() {
-    return this.colLocation;
-  }
-
-  public Long getId() {
-    return this.id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getSign() {
-    return this.sign;
   }
 }

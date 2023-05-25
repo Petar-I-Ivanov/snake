@@ -1,4 +1,4 @@
-package com.github.snake.services.enemy;
+package com.github.snake.services.gameboard.enemy;
 
 import com.github.snake.models.Game;
 

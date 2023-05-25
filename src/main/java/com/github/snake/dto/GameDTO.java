@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class GameDTO {
 
-  private long id;
+  private String id;
   private GameStatusEnum status;
   private short turn;
   private String[][] map;

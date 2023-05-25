@@ -1,4 +1,4 @@
-package com.github.snake.services;
+package com.github.snake.services.gameboard.helpers;
 
 import com.github.snake.models.Game;
 import com.github.snake.utilities.Constants;

@@ -1,10 +1,10 @@
-package com.github.snake.services.enemy;
+package com.github.snake.services.gameboard.enemy;
 
 import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.enemy.Poacher;
 import com.github.snake.repositories.Repository;
-import com.github.snake.services.GameboardPositionService;
-import com.github.snake.services.RandomPositionGeneratorService;
+import com.github.snake.services.gameboard.helpers.GameboardPositionService;
+import com.github.snake.services.gameboard.helpers.RandomPositionGeneratorService;
 import com.github.snake.utilities.Position;
 import com.github.snake.utilities.RandomGenerator;
 import jakarta.enterprise.context.ApplicationScoped;

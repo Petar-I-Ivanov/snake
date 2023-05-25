@@ -1,8 +1,9 @@
-package com.github.snake.services;
+package com.github.snake.services.gameboard.terrain;
 
 import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.Exit;
 import com.github.snake.repositories.Repository;
+import com.github.snake.services.gameboard.helpers.RandomPositionGeneratorService;
 import com.github.snake.utilities.Position;
 import jakarta.enterprise.context.ApplicationScoped;
 

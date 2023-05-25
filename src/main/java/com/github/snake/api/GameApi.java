@@ -26,7 +26,7 @@ public class GameApi {
 
   @GET
   @Path("/{gameId}")
-  public GameDTO getGame(@PathParam("gameId") Long gameId) {
+  public GameDTO getGame(@PathParam("gameId") String gameId) {
     return mappingService.findById(gameId);
   }
 
@@ -37,7 +37,7 @@ public class GameApi {
 
   @PUT
   @Path("/{gameId}")
-  public GameDTO makeAction(@PathParam("gameId") Long gameId, @Valid Input input) {
+  public GameDTO makeAction(@PathParam("gameId") String gameId, @Valid Input input) {
 
     char action = input.getAction().charAt(0);
     return mappingService.makeAction(gameId, action);

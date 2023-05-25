@@ -1,30 +1,35 @@
-package com.github.snake.services;
+package com.github.snake.services.gameboard;
 
 import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.snake.SnakeBody;
 import com.github.snake.models.gameboard.snake.SnakeHead;
 import com.github.snake.repositories.Repository;
+import com.github.snake.services.gameboard.food.FoodService;
+import com.github.snake.services.gameboard.helpers.GameboardPositionService;
+import com.github.snake.services.gameboard.helpers.RandomPositionGeneratorService;
 import com.github.snake.utilities.Position;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
+// TODO: edit the logic and make it work
 @ApplicationScoped
 public class SnakeService {
 
   private Repository repository;
+  private FoodService foodService;
+
   private GameboardPositionService positionService;
   private RandomPositionGeneratorService randomPositionService;
 
-  public SnakeService(Repository repository, GameboardPositionService positionService,
+  public SnakeService(Repository repository, FoodService foodService,
+      GameboardPositionService positionService,
       RandomPositionGeneratorService randomPositionService) {
 
     this.repository = repository;
+    this.foodService = foodService;
+
     this.positionService = positionService;
     this.randomPositionService = randomPositionService;
-  }
-
-  public Position getSnakeHeadLocation(Long gameId) {
-    return repository.findSingleByGameId(gameId, SnakeHead.class).getLocation();
   }
 
   public int getSnakeSize(Long gameId) {
@@ -55,7 +60,7 @@ public class SnakeService {
 
     Position nextPosition = Position.getNextPositionFromChar(head.getLocation(), action);
 
-    validateNextPosition(game, head, nextPosition);
+    nextPosition = validateNextPosition(game, head, nextPosition);
 
     if (!positionService.isPositionOccupied(game.getId(), nextPosition)) {
       moveAndReturnLastPosition(head, bodies, nextPosition);
@@ -68,15 +73,18 @@ public class SnakeService {
     repository.save(bodies);
   }
 
-  private void validateNextPosition(Game game, SnakeHead head, Position nextPosition) {
+  private Position validateNextPosition(Game game, SnakeHead head, Position nextPosition) {
 
     if (!Position.isPositionInBorders(game, nextPosition) && !head.isBorderFoodActive()) {
       throw new IllegalArgumentException("Next position is outside the borders.");
     }
 
-    if (head.isBorderFoodActive()) {
+    if (head.isBorderFoodActive() && !Position.isPositionInBorders(game, nextPosition)) {
       head.setBorderFoodActive(false);
+      return Position.modifyOutOfBorderPosition(game, nextPosition);
     }
+
+    return nextPosition;
   }
 
   private void handleFoodEating(Game game, SnakeHead head, List<SnakeBody> bodies,
@@ -89,26 +97,30 @@ public class SnakeService {
     }
 
     if (positionService.isPositionPoisonousFood(gameId, nextPosition)) {
-      moveToPoisonousFood(gameId, head, bodies, nextPosition);
+
+      SnakeBody lastBody = moveToPoisonousFood(gameId, head, bodies, nextPosition);
+      bodies.remove(lastBody);
+      repository.delete(lastBody);
+      repository.save(bodies);
     }
 
     if (positionService.isPositionBorderFood(gameId, nextPosition)) {
 
-      positionService.eatSpecialFood(gameId, nextPosition);
+      foodService.eatFoodAtPosition(gameId, nextPosition);
       moveAndReturnLastPosition(head, bodies, nextPosition);
       head.setBorderFoodActive(true);
     }
 
     if (positionService.isPositionGrowthFood(gameId, nextPosition)) {
 
-      positionService.eatSpecialFood(gameId, nextPosition);
+      foodService.eatFoodAtPosition(gameId, nextPosition);
       moveAndReturnLastPosition(head, bodies, nextPosition);
       head.setGrowthFoodActive(true);
     }
 
     if (positionService.isPositionImmunityFood(gameId, nextPosition)) {
 
-      positionService.eatSpecialFood(gameId, nextPosition);
+      foodService.eatFoodAtPosition(gameId, nextPosition);
       moveAndReturnLastPosition(head, bodies, nextPosition);
       head.setImmunityFoodActive(true);
     }
@@ -125,30 +137,29 @@ public class SnakeService {
     }
   }
 
-  private void moveToPoisonousFood(Long gameId, SnakeHead head, List<SnakeBody> bodies,
+  private SnakeBody moveToPoisonousFood(Long gameId, SnakeHead head, List<SnakeBody> bodies,
       Position nextPosition) {
 
-    positionService.eatSpecialFood(gameId, nextPosition);
+    foodService.eatFoodAtPosition(gameId, nextPosition);
     moveAndReturnLastPosition(head, bodies, nextPosition);
 
     if (head.isImmunityFoodActive()) {
       head.setImmunityFoodActive(false);
-      return;
+      return null;
     }
 
     if (bodies.isEmpty()) {
       head.setPoisonousFoodActive(true);
-      return;
+      return null;
     }
 
-    SnakeBody lastBody = bodies.get(bodies.size() - 1);
-    repository.delete(lastBody);
+    return bodies.get(bodies.size() - 1);
   }
 
   private void moveToNormalFood(Game game, SnakeHead head, List<SnakeBody> bodies,
       Position nextPosition) {
 
-    positionService.eatNormalFood(game.getId(), nextPosition);
+    foodService.eatFoodAtPosition(game.getId(), nextPosition);
     Position lastPosition = moveAndReturnLastPosition(head, bodies, nextPosition);
 
     if (!head.isPoisonousFoodActive()) {

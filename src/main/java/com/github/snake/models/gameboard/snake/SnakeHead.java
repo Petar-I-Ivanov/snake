@@ -10,8 +10,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "snake_head")
 public class SnakeHead extends GameboardObject {
@@ -29,10 +31,10 @@ public class SnakeHead extends GameboardObject {
 
   @Column(name = "is_poisonous_food_active", nullable = false)
   private boolean isPoisonousFoodActive;
-  
+
   @Column(name = "is_killed", nullable = false)
   private boolean isKilled;
-  
+
   @Column(name = "is_escaped", nullable = false)
   private boolean isEscaped;
 

@@ -1,4 +1,4 @@
-package com.github.snake.services.food;
+package com.github.snake.services.gameboard.food;
 
 import com.github.snake.models.Game;
 import com.github.snake.utilities.Position;

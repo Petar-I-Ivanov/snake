@@ -31,11 +31,11 @@ public class Game {
 
   private short turn;
 
-  @OneToMany(mappedBy = "game")
-  private List<Barrier> barriers;
-
   @OneToOne(mappedBy = "game")
-  private Exit exit;
+  private SnakeHead snakeHead;
+
+  @OneToMany(mappedBy = "game")
+  private List<SnakeBody> snakeBodies;
 
   @OneToOne(mappedBy = "game")
   private NormalFood normalFood;
@@ -46,11 +46,11 @@ public class Game {
   @OneToMany(mappedBy = "game")
   private List<Enemy> enemies;
 
-  @OneToOne(mappedBy = "game")
-  private SnakeHead snakeHead;
-
   @OneToMany(mappedBy = "game")
-  private List<SnakeBody> snakeBodies;
+  private List<Barrier> barriers;
+
+  @OneToOne(mappedBy = "game")
+  private Exit exit;
 
   public Game() {
     this.status = GameStatusEnum.LEVEL_ONE;
