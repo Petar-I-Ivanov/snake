@@ -72,7 +72,8 @@ public class RandomPositionGeneratorService {
   public Position getRandomFreeInlinePositionAround(Game game, Position aroundPosition) {
 
     List<Position> filteredPositions = getPositionsAround(game, aroundPosition).stream()
-        .filter(position -> isPositionFreeAndInline(game.getId(), position, position)).toList();
+        .filter(position -> isPositionFreeAndInline(game.getId(), aroundPosition, position))
+        .toList();
 
     return getRandomPositionFromList(filteredPositions);
   }
@@ -172,13 +173,17 @@ public class RandomPositionGeneratorService {
 
     for (int row = 0; row <= 1; row++) {
       for (int col = 0; col <= border; col++) {
-        positions.add(new Position(row, col));
+
+        int tempRow = (row == 1) ? border : row;
+        positions.add(new Position(tempRow, col));
       }
     }
 
     for (int row = 0; row <= border; row++) {
       for (int col = 0; col <= 1; col++) {
-        positions.add(new Position(row, col));
+
+        int tempCol = (col == 1) ? border : col;
+        positions.add(new Position(row, tempCol));
       }
     }
 

@@ -45,16 +45,28 @@ public class GamePlayService {
 
   public void gameLoop(Game game, char action) {
 
-    snakeService.move(game, action);
-    foodService.foodCheck(game);
-    enemyService.turnActionAndChecks(game);
-  }
+    turnActions(game, action);
 
-  public void expandingGameboard(Game game) {
+    GameStatusEnum gameStatus = game.getStatus();
+    GameStatusEnum expectedStatus = getExpectedStatus(game.getId());
 
-    commonGameboardService.moveAllWithOneRowAndCol(game.getId());
-    barrierService.generateBarrier(game);
-    enemyService.generatePoacher(game);
+    if (isExpectedStatusDifferent(gameStatus, expectedStatus)
+        && isGameboardIncreasing(gameStatus, expectedStatus)) {
+
+      game.setStatus(expectedStatus);
+      expandingGameboard(game);
+
+      if (isLastExpand(expectedStatus)) {
+        exitService.generateExit(game);
+      }
+    }
+
+    if (snakeService.isSnakeEscaped(game.getId()) || snakeService.isSnakeKilled(game.getId())) {
+
+      GameStatusEnum status =
+          snakeService.isSnakeEscaped(game.getId()) ? GameStatusEnum.WON : GameStatusEnum.LOST;
+      game.setStatus(status);
+    }
   }
 
   public String[][] getGameboard(Game game) {
@@ -67,22 +79,18 @@ public class GamePlayService {
     return setEmptySpacesAndReturn(gameboard);
   }
 
-  public boolean isGameExpanding(Game game) {
+  private void turnActions(Game game, char action) {
 
-    GameStatusEnum expectedStatus = getExpectedStatus(game.getId());
+    snakeService.move(game, action);
+    foodService.foodCheck(game);
+    enemyService.turnActionAndChecks(game);
+  }
 
-    if (game.getStatus() != expectedStatus) {
+  private void expandingGameboard(Game game) {
 
-      game.setStatus(expectedStatus);
-
-      if (isLastExpand(game.getStatus())) {
-        exitService.generateExit(game);
-      }
-
-      return true;
-    }
-
-    return false;
+    commonGameboardService.moveAllWithOneRowAndCol(game.getId());
+    barrierService.generateBarrier(game);
+    enemyService.generatePoacher(game);
   }
 
   private GameStatusEnum getExpectedStatus(Long gameId) {
@@ -116,6 +124,16 @@ public class GamePlayService {
 
   private static boolean isSnakeSizeInStatusBorder(int snakeSize, GameStatusEnum status) {
     return status.getLowerBound() <= snakeSize && status.getUpperBound() >= snakeSize;
+  }
+
+  private static boolean isExpectedStatusDifferent(GameStatusEnum gameStatus,
+      GameStatusEnum expectedStatus) {
+    return gameStatus != expectedStatus;
+  }
+
+  private static boolean isGameboardIncreasing(GameStatusEnum gameStatus,
+      GameStatusEnum expectedStatus) {
+    return gameStatus.getLowerBound() < expectedStatus.getLowerBound();
   }
 
   private static boolean isLastExpand(GameStatusEnum gameStatus) {

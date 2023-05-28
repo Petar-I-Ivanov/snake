@@ -61,17 +61,18 @@ public class SnakeMovementService {
 
         if (head.isGrowthFoodActive()) {
 
-          lastPosition =
+          Position newLastPosition =
               randomPositionService.getRandomFreeInlinePositionAround(game, lastPosition);
 
-          if (lastPosition != null) {
+          // inside this if the bodies are lost
+          // if (newLastPosition != null) {
 
-            SnakeBody growthBody = new SnakeBody();
-            growthBody.setLocation(lastPosition);
-            growthBody.setGame(game);
+          SnakeBody growthBody = new SnakeBody();
+          growthBody.setLocation(newLastPosition);
+          growthBody.setGame(game);
 
-            bodies.add(growthBody);
-          }
+          bodies.add(growthBody);
+          // }
 
           head.setGrowthFoodActive(false);
         }

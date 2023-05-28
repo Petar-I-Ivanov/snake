@@ -66,6 +66,10 @@ public class PoacherService {
     Position nextPosition =
         randomPositionService.getRandomFreeOrBarrierPositionAround(game, poacher.getLocation());
 
+    if (nextPosition == null) {
+      return;
+    }
+
     if (positionService.isPositionBarrier(game.getId(), nextPosition)) {
 
       do {

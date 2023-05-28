@@ -38,10 +38,6 @@ public class GameService {
 
     gamePlayService.gameLoop(game, action);
 
-    if (gamePlayService.isGameExpanding(game)) {
-      gamePlayService.expandingGameboard(game);
-    }
-
     game.setTurn((short) (game.getTurn() + 1));
     gameRepository.persistAndFlush(game);
     return game;
