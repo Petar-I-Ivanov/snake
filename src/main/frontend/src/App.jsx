@@ -1,21 +1,20 @@
-import { useNavigate } from '@solidjs/router';
+import { Router, Routes, Route } from '@solidjs/router';
+
+import Welcome from './components/Welcome';
+import Game from './components/game/Game';
+import Result from './components/Result';
 
 function App() {
 
-  const navigate = useNavigate();
-
-  const startNewGame = async () => {
-    const response = await fetch("http://localhost:8080/game", { method: "POST" });
-    const game = await response.json();
-    navigate(`/game/${game.id}`);
-  };
-
-  return (
-    <div>
-      <h1>Welcome to Snake Game</h1>
-      <button onClick={startNewGame}>Start New Game</button>
-    </div>
-  );
+    return (
+        <Router>
+            <Routes>
+                <Route path='/' component={Welcome} />
+                <Route path='/game/:gameId' component={Game} />
+                <Route path='/result/:gameId' component={Result} />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

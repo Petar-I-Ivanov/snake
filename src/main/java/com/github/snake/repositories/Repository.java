@@ -175,4 +175,11 @@ public class Repository {
   public <T extends GameboardObject> void delete(T entity) {
     entityManager.remove(entityManager.find(entity.getClass(), entity.getId()));
   }
+
+  /**
+   * @param gameId - the game ID where all related gameboard entities should be deleted
+   */
+  public void deleteAll(Long gameId) {
+    findAllByGameId(gameId).stream().forEach(this::delete);
+  }
 }

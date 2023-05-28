@@ -44,5 +44,6 @@ nb-configuration.xml
 
 # Node modules
 node_modules/
+package-lock.json
 
 build/

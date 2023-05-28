@@ -29,4 +29,8 @@ public class CommonGameboardService {
   public List<GameboardObject> findAllForGameId(Long gameId) {
     return repository.findAllByGameId(gameId);
   }
+
+  public void deleteGameboardObjects(Long gameId) {
+    repository.deleteAll(gameId);
+  }
 }

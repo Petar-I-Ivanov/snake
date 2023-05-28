@@ -1,6 +1,9 @@
-import { createEffect, createSignal } from "solid-js";
-import { useNavigate, useParams } from "@solidjs/router";
-import RenderGame from "./RenderGame";
+import { createEffect, createSignal } from 'solid-js';
+import { useNavigate, useParams } from '@solidjs/router';
+
+import RenderGame from './RenderGame';
+import './Game.css';
+import Explanation from './Explanation';
 
 const Game = () => {
 
@@ -8,11 +11,11 @@ const Game = () => {
   const navigate = useNavigate();
 
   const [game, setGame] = createSignal({
-    status: "",
+    status: '',
     turn: 0,
     map: Array.from({ length: 15 }, () => Array(15))
   });
-  const [error, setError] = createSignal("");
+  const [error, setError] = createSignal('');
 
   createEffect(() => {
     const fetchGame = async () => {
@@ -39,7 +42,7 @@ const Game = () => {
 
     if (response.status === 200) {
 
-      if (json.status === "WON" || json.status === "LOST") {
+      if (json.status === 'WON' || json.status === 'LOST') {
         navigate(`/result/${gameId}`);
       }
 
@@ -48,25 +51,28 @@ const Game = () => {
     }
 
     if (response.status === 400) {
-        setError("Invalid input!");
+      setError('Invalid input!');
     }
 
     if (response.status === 500) {
-        setError("Next possition is unavailable.");
+      setError('Next possition is unavailable.');
     }
 
-    e.target.action.value = "";
+    e.target.action.value = '';
   };
 
   return (
-    <div>
+    <div class='game-container'>
+
       <RenderGame game={game()} />
 
-      <form onSubmit={makeAction}>
+      <form class='game-form' onSubmit={makeAction}>
         {error && <p>{error}</p>}
-        <input type='text' id='action' />
-        <button type='submit'>Submit</button>
+        <input class='game-input' type='text' id='action' maxLength='1' autofocus />
+        <button class='game-btn' type='submit'>Submit</button>
       </form>
+
+      <Explanation />
     </div>
   );
 };

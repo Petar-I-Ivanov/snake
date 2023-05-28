@@ -66,6 +66,7 @@ public class GamePlayService {
       GameStatusEnum status =
           snakeService.isSnakeEscaped(game.getId()) ? GameStatusEnum.WON : GameStatusEnum.LOST;
       game.setStatus(status);
+      commonGameboardService.deleteGameboardObjects(game.getId());
     }
   }
 
