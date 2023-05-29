@@ -3,18 +3,19 @@ package com.github.snake.services;
 import com.github.snake.models.Game;
 import com.github.snake.models.GameStatusEnum;
 import com.github.snake.models.gameboard.GameboardObject;
-import com.github.snake.services.gameboard.enemy.EnemyService;
-import com.github.snake.services.gameboard.food.FoodService;
-import com.github.snake.services.gameboard.helpers.CommonGameboardService;
-import com.github.snake.services.gameboard.snake.SnakeService;
-import com.github.snake.services.gameboard.terrain.BarrierService;
-import com.github.snake.services.gameboard.terrain.ExitService;
+import com.github.snake.services.interfaces.BarrierService;
+import com.github.snake.services.interfaces.EnemyService;
+import com.github.snake.services.interfaces.ExitService;
+import com.github.snake.services.interfaces.FoodService;
+import com.github.snake.services.interfaces.GamePlayService;
+import com.github.snake.services.interfaces.GameboardService;
+import com.github.snake.services.interfaces.SnakeService;
 import com.github.snake.utilities.Constants;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Arrays;
 
 @ApplicationScoped
-public class GamePlayService {
+public class GamePlayServiceImpl implements GamePlayService {
 
   private SnakeService snakeService;
   private FoodService foodService;
@@ -22,11 +23,11 @@ public class GamePlayService {
   private BarrierService barrierService;
   private ExitService exitService;
 
-  private CommonGameboardService commonGameboardService;
+  private GameboardService gameboardService;
 
-  public GamePlayService(SnakeService snakeService, FoodService foodService,
+  public GamePlayServiceImpl(SnakeService snakeService, FoodService foodService,
       EnemyService enemyService, BarrierService barrierService, ExitService exitService,
-      CommonGameboardService commonGameboardService) {
+      GameboardService gameboardService) {
 
     this.snakeService = snakeService;
     this.foodService = foodService;
@@ -34,27 +35,32 @@ public class GamePlayService {
     this.barrierService = barrierService;
     this.exitService = exitService;
 
-    this.commonGameboardService = commonGameboardService;
+    this.gameboardService = gameboardService;
   }
 
+  @Override
   public boolean isGrowthFoodActive(Long gameId) {
     return snakeService.isGrowthFoodActive(gameId);
   }
 
+  @Override
   public boolean isBorderFoodActive(Long gameId) {
     return snakeService.isBorderFoodActive(gameId);
   }
 
+  @Override
   public boolean isImmunityFoodActive(Long gameId) {
     return snakeService.isImmunityFoodActive(gameId);
   }
 
+  @Override
   public void generateStartingObjects(Game game) {
 
     snakeService.generateSnake(game);
     foodService.foodCheck(game);
   }
 
+  @Override
   public void gameLoop(Game game, char action) {
 
     turnActions(game, action);
@@ -78,10 +84,11 @@ public class GamePlayService {
       GameStatusEnum status =
           snakeService.isSnakeEscaped(game.getId()) ? GameStatusEnum.WON : GameStatusEnum.LOST;
       game.setStatus(status);
-      commonGameboardService.deleteGameboardObjects(game.getId());
+      gameboardService.deleteGameboardObjects(game.getId());
     }
   }
 
+  @Override
   public String[][] getGameboard(Game game) {
 
     byte border = Constants.getGameboardRowCol(game);
@@ -101,7 +108,7 @@ public class GamePlayService {
 
   private void expandingGameboard(Game game) {
 
-    commonGameboardService.moveAllWithOneRowAndCol(game.getId());
+    gameboardService.moveAllWithOneRowAndCol(game.getId());
     barrierService.generateBarrier(game);
     enemyService.generatePoacher(game);
   }
@@ -116,7 +123,7 @@ public class GamePlayService {
 
   private void setGameboardObjects(Long gameId, String[][] gameboard) {
 
-    for (GameboardObject object : commonGameboardService.findAllForGameId(gameId)) {
+    for (GameboardObject object : gameboardService.findAllForGameId(gameId)) {
       gameboard[object.getRowLocation()][object.getColLocation()] = object.getSign();
     }
   }

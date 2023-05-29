@@ -1,6 +1,8 @@
 package com.github.snake.services.gameboard.helpers;
 
 import com.github.snake.models.Game;
+import com.github.snake.services.interfaces.PositionCheckService;
+import com.github.snake.services.interfaces.RandomPositionService;
 import com.github.snake.utilities.Constants;
 import com.github.snake.utilities.Position;
 import com.github.snake.utilities.RandomGenerator;
@@ -9,14 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
-public class RandomPositionGeneratorService {
+public class RandomPositionGeneratorServiceImpl implements RandomPositionService {
 
-  private GameboardPositionService positionService;
+  private PositionCheckService positionService;
 
-  public RandomPositionGeneratorService(GameboardPositionService positionService) {
+  public RandomPositionGeneratorServiceImpl(PositionCheckService positionService) {
     this.positionService = positionService;
   }
 
+  @Override
   public Position getRandomSpawnFoodPosition(Game game) {
 
     Position headPosition = positionService.getSnakeHeadPosition(game.getId());
@@ -29,6 +32,7 @@ public class RandomPositionGeneratorService {
     return randomPosition;
   }
 
+  @Override
   public Position getRandomSpawnBarrierPosition(Game game) {
 
     List<Position> filteredPositions = getBarrierSpawnPositions(game).stream()
@@ -37,6 +41,7 @@ public class RandomPositionGeneratorService {
     return getRandomPositionFromList(filteredPositions);
   }
 
+  @Override
   public Position getRandomSpawnPoacherPosition(Game game) {
 
     List<Position> filteredPositions = getPoacherSpawnPositions(game).stream()
@@ -45,6 +50,7 @@ public class RandomPositionGeneratorService {
     return getRandomPositionFromList(filteredPositions);
   }
 
+  @Override
   public Position getRandomSpawnExitPosition(Game game) {
 
     List<Position> filteredPositions = getExitSpawnPositions(game).stream()
@@ -53,6 +59,7 @@ public class RandomPositionGeneratorService {
     return getRandomPositionFromList(filteredPositions);
   }
 
+  @Override
   public Position getRandomFreePositionAround(Game game, Position aroundPosition) {
 
     List<Position> filteredPositions = getPositionsAround(game, aroundPosition).stream()
@@ -61,6 +68,7 @@ public class RandomPositionGeneratorService {
     return getRandomPositionFromList(filteredPositions);
   }
 
+  @Override
   public Position getRandomFreeOrBarrierPositionAround(Game game, Position aroundPosition) {
 
     List<Position> filteredPositions = getPositionsAround(game, aroundPosition).stream()
@@ -69,6 +77,7 @@ public class RandomPositionGeneratorService {
     return getRandomPositionFromList(filteredPositions);
   }
 
+  @Override
   public Position getRandomFreeInlinePositionAround(Game game, Position aroundPosition) {
 
     List<Position> filteredPositions = getPositionsAround(game, aroundPosition).stream()
@@ -76,6 +85,26 @@ public class RandomPositionGeneratorService {
         .toList();
 
     return getRandomPositionFromList(filteredPositions);
+  }
+
+  private boolean isFoodSpawnPositionUnavailable(Game game, Position spawn, Position head) {
+    return !isPositionFree(game.getId(), spawn) || isSpawnInTwoRowsAndColsFromHead(spawn, head);
+  }
+
+  private boolean isPositionFreeAndInline(Long gameId, Position aroundPosition, Position position) {
+
+    return !positionService.isPositionOccupied(gameId, position)
+        && Position.arePositionsInlineAndAround(aroundPosition, position);
+  }
+
+  private boolean isPositionFree(Long gameId, Position position) {
+    return !positionService.isPositionOccupied(gameId, position);
+  }
+
+  private boolean isPositionFreeOrBarrier(Long gameId, Position position) {
+
+    return !positionService.isPositionOccupied(gameId, position)
+        || positionService.isPositionBarrier(gameId, position);
   }
 
   private static boolean isSpawnInTwoRowsAndColsFromHead(Position spawn, Position snakeHead) {
@@ -187,25 +216,5 @@ public class RandomPositionGeneratorService {
     }
 
     return positions;
-  }
-
-  private boolean isFoodSpawnPositionUnavailable(Game game, Position spawn, Position head) {
-    return !isPositionFree(game.getId(), spawn) || isSpawnInTwoRowsAndColsFromHead(spawn, head);
-  }
-
-  private boolean isPositionFreeAndInline(Long gameId, Position aroundPosition, Position position) {
-
-    return !positionService.isPositionOccupied(gameId, position)
-        && Position.arePositionsInlineAndAround(aroundPosition, position);
-  }
-
-  private boolean isPositionFree(Long gameId, Position position) {
-    return !positionService.isPositionOccupied(gameId, position);
-  }
-
-  private boolean isPositionFreeOrBarrier(Long gameId, Position position) {
-
-    return !positionService.isPositionOccupied(gameId, position)
-        || positionService.isPositionBarrier(gameId, position);
   }
 }

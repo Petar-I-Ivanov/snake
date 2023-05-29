@@ -2,25 +2,29 @@ package com.github.snake.services;
 
 import com.github.snake.models.Game;
 import com.github.snake.repositories.GameRepository;
+import com.github.snake.services.interfaces.GamePlayService;
+import com.github.snake.services.interfaces.GameService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
-public class GameService {
+public class GameServiceImpl implements GameService {
 
   private GameRepository gameRepository;
   private GamePlayService gamePlayService;
 
-  public GameService(GameRepository gameRepository, GamePlayService gamePlayService) {
+  public GameServiceImpl(GameRepository gameRepository, GamePlayService gamePlayService) {
 
     this.gameRepository = gameRepository;
     this.gamePlayService = gamePlayService;
   }
 
+  @Override
   public Game findById(Long gameId) {
     return gameRepository.findById(gameId);
   }
 
+  @Override
   @Transactional
   public Game startNewGame() {
 
@@ -31,8 +35,9 @@ public class GameService {
     return game;
   }
 
+  @Override
   @Transactional
-  public Game gameLoop(Long gameId, char action) {
+  public Game makeAction(Long gameId, char action) {
 
     Game game = gameRepository.findById(gameId);
 
@@ -41,23 +46,5 @@ public class GameService {
     game.setTurn((short) (game.getTurn() + 1));
     gameRepository.persistAndFlush(game);
     return game;
-  }
-
-  public String[][] getGameboard(Long gameId) {
-
-    Game game = gameRepository.findById(gameId);
-    return gamePlayService.getGameboard(game);
-  }
-
-  public boolean isGrowthFoodActive(Long gameId) {
-    return gamePlayService.isGrowthFoodActive(gameId);
-  }
-
-  public boolean isBorderFoodActive(Long gameId) {
-    return gamePlayService.isBorderFoodActive(gameId);
-  }
-
-  public boolean isImmunityFoodActive(Long gameId) {
-    return gamePlayService.isImmunityFoodActive(gameId);
   }
 }

@@ -4,9 +4,9 @@ import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.snake.SnakeBody;
 import com.github.snake.models.gameboard.snake.SnakeHead;
 import com.github.snake.repositories.Repository;
-import com.github.snake.services.gameboard.food.FoodService;
-import com.github.snake.services.gameboard.helpers.GameboardPositionService;
-import com.github.snake.services.gameboard.helpers.RandomPositionGeneratorService;
+import com.github.snake.services.interfaces.FoodService;
+import com.github.snake.services.interfaces.PositionCheckService;
+import com.github.snake.services.interfaces.RandomPositionService;
 import com.github.snake.utilities.Position;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -17,12 +17,11 @@ public class SnakeMovementService {
   private Repository repository;
   private FoodService foodService;
 
-  private GameboardPositionService positionService;
-  private RandomPositionGeneratorService randomPositionService;
+  private PositionCheckService positionService;
+  private RandomPositionService randomPositionService;
 
   public SnakeMovementService(Repository repository, FoodService foodService,
-      GameboardPositionService positionService,
-      RandomPositionGeneratorService randomPositionService) {
+      PositionCheckService positionService, RandomPositionService randomPositionService) {
 
     this.repository = repository;
     this.foodService = foodService;

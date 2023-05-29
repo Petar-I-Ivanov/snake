@@ -3,25 +3,26 @@ package com.github.snake.services.gameboard.food;
 import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.foods.normal.NormalFood;
 import com.github.snake.repositories.Repository;
-import com.github.snake.services.gameboard.helpers.RandomPositionGeneratorService;
+import com.github.snake.services.interfaces.NormalFoodService;
+import com.github.snake.services.interfaces.RandomPositionService;
 import com.github.snake.utilities.Constants;
 import com.github.snake.utilities.Position;
 import com.github.snake.utilities.RandomGenerator;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class NormalFoodService {
+public class NormalFoodServiceImpl implements NormalFoodService {
 
   private Repository repository;
-  private RandomPositionGeneratorService randomPositionService;
+  private RandomPositionService randomPositionService;
 
-  public NormalFoodService(Repository repository,
-      RandomPositionGeneratorService randomPositionService) {
+  public NormalFoodServiceImpl(Repository repository, RandomPositionService randomPositionService) {
 
     this.repository = repository;
     this.randomPositionService = randomPositionService;
   }
 
+  @Override
   public void normalFoodCheck(Game game) {
 
     NormalFood food = repository.findSingleByGameId(game.getId(), NormalFood.class);
@@ -37,6 +38,7 @@ public class NormalFoodService {
 
   }
 
+  @Override
   public void eatFoodAtPosition(Long gameId, Position position) {
 
     NormalFood food = repository.findByGameIdAndPosition(gameId, position, NormalFood.class);

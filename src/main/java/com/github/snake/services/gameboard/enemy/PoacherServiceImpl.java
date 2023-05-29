@@ -3,23 +3,24 @@ package com.github.snake.services.gameboard.enemy;
 import com.github.snake.models.Game;
 import com.github.snake.models.gameboard.enemy.Poacher;
 import com.github.snake.repositories.Repository;
-import com.github.snake.services.gameboard.helpers.GameboardPositionService;
-import com.github.snake.services.gameboard.helpers.RandomPositionGeneratorService;
+import com.github.snake.services.interfaces.PoacherService;
+import com.github.snake.services.interfaces.PositionCheckService;
+import com.github.snake.services.interfaces.RandomPositionService;
+import com.github.snake.services.interfaces.TrapService;
 import com.github.snake.utilities.Position;
 import com.github.snake.utilities.RandomGenerator;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class PoacherService {
+public class PoacherServiceImpl implements PoacherService {
 
   private Repository repository;
   private TrapService trapService;
-  private RandomPositionGeneratorService randomPositionService;
-  private GameboardPositionService positionService;
+  private RandomPositionService randomPositionService;
+  private PositionCheckService positionService;
 
-  public PoacherService(Repository repository, TrapService trapService,
-      RandomPositionGeneratorService randomPositionService,
-      GameboardPositionService positionService) {
+  public PoacherServiceImpl(Repository repository, TrapService trapService,
+      RandomPositionService randomPositionService, PositionCheckService positionService) {
 
     this.repository = repository;
     this.trapService = trapService;
@@ -27,6 +28,7 @@ public class PoacherService {
     this.positionService = positionService;
   }
 
+  @Override
   public void generatePoacher(Game game) {
 
     Position position = randomPositionService.getRandomSpawnPoacherPosition(game);
@@ -44,6 +46,7 @@ public class PoacherService {
     }
   }
 
+  @Override
   public void movePoachers(Game game) {
 
     for (Poacher poacher : repository.findListByGameId(game.getId(), Poacher.class)) {
