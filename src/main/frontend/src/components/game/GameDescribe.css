@@ -1,7 +1,7 @@
-.explanation-container {
+.describe-container {
     position: fixed;
     top: 50%;
-    right: 0;
+    left: 0;
     transform: translateY(-50%);
     background-color: #f4f4f4;
     padding: 20px;

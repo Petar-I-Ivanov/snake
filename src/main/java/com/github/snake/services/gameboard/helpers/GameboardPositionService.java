@@ -8,6 +8,7 @@ import com.github.snake.models.gameboard.foods.special.BorderFood;
 import com.github.snake.models.gameboard.foods.special.GrowthFood;
 import com.github.snake.models.gameboard.foods.special.ImmunityFood;
 import com.github.snake.models.gameboard.foods.special.PoisonousFood;
+import com.github.snake.models.gameboard.snake.SnakeBody;
 import com.github.snake.models.gameboard.snake.SnakeHead;
 import com.github.snake.repositories.Repository;
 import com.github.snake.utilities.Position;
@@ -48,6 +49,10 @@ public class GameboardPositionService {
 
   public boolean isPositionPoisonousFood(Long gameId, Position position) {
     return repository.findByGameIdAndPosition(gameId, position, PoisonousFood.class) != null;
+  }
+
+  public boolean isPositionSnakeBody(Long gameId, Position position) {
+    return repository.findByGameIdAndPosition(gameId, position, SnakeBody.class) != null;
   }
 
   public boolean isPositionEnemy(Long gameId, Position position) {

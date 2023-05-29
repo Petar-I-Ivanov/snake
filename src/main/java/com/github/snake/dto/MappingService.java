@@ -44,7 +44,14 @@ public class MappingService {
     dto.setTurn(game.getTurn());
 
     if (isGameOngoing(game)) {
-      dto.setMap(gameService.getGameboard(game.getId()));
+
+      Long gameId = game.getId();
+
+      dto.setMap(gameService.getGameboard(gameId));
+
+      dto.setBorderActive(gameService.isBorderFoodActive(gameId));
+      dto.setGrowthActive(gameService.isGrowthFoodActive(gameId));
+      dto.setImmunityActive(gameService.isImmunityFoodActive(gameId));
     }
 
     return dto;

@@ -3,10 +3,10 @@ package com.github.snake.services;
 import com.github.snake.models.Game;
 import com.github.snake.models.GameStatusEnum;
 import com.github.snake.models.gameboard.GameboardObject;
-import com.github.snake.services.gameboard.SnakeService;
 import com.github.snake.services.gameboard.enemy.EnemyService;
 import com.github.snake.services.gameboard.food.FoodService;
 import com.github.snake.services.gameboard.helpers.CommonGameboardService;
+import com.github.snake.services.gameboard.snake.SnakeService;
 import com.github.snake.services.gameboard.terrain.BarrierService;
 import com.github.snake.services.gameboard.terrain.ExitService;
 import com.github.snake.utilities.Constants;
@@ -35,6 +35,18 @@ public class GamePlayService {
     this.exitService = exitService;
 
     this.commonGameboardService = commonGameboardService;
+  }
+
+  public boolean isGrowthFoodActive(Long gameId) {
+    return snakeService.isGrowthFoodActive(gameId);
+  }
+
+  public boolean isBorderFoodActive(Long gameId) {
+    return snakeService.isBorderFoodActive(gameId);
+  }
+
+  public boolean isImmunityFoodActive(Long gameId) {
+    return snakeService.isImmunityFoodActive(gameId);
   }
 
   public void generateStartingObjects(Game game) {

@@ -121,7 +121,6 @@ public class RandomPositionGeneratorService {
     return positions;
   }
 
-  // TODO: edit
   private static List<Position> getBarrierSpawnPositions(Game game) {
 
     List<Position> positions = new ArrayList<>();
@@ -194,14 +193,14 @@ public class RandomPositionGeneratorService {
     return !isPositionFree(game.getId(), spawn) || isSpawnInTwoRowsAndColsFromHead(spawn, head);
   }
 
-  private boolean isPositionFree(Long gameId, Position position) {
-    return !positionService.isPositionOccupied(gameId, position);
-  }
-
   private boolean isPositionFreeAndInline(Long gameId, Position aroundPosition, Position position) {
 
     return !positionService.isPositionOccupied(gameId, position)
         && Position.arePositionsInlineAndAround(aroundPosition, position);
+  }
+
+  private boolean isPositionFree(Long gameId, Position position) {
+    return !positionService.isPositionOccupied(gameId, position);
   }
 
   private boolean isPositionFreeOrBarrier(Long gameId, Position position) {

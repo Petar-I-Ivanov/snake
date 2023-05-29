@@ -4,6 +4,7 @@ import { useNavigate, useParams } from '@solidjs/router';
 import RenderGame from './RenderGame';
 import './Game.css';
 import Explanation from './Explanation';
+import GameDescribe from './GameDescribe';
 
 const Game = () => {
 
@@ -13,7 +14,10 @@ const Game = () => {
   const [game, setGame] = createSignal({
     status: '',
     turn: 0,
-    map: Array.from({ length: 15 }, () => Array(15))
+    map: Array.from({ length: 15 }, () => Array(15)),
+    borderActive: false,
+    growthActive: false,
+    immunityActive: false
   });
   const [error, setError] = createSignal('');
 
@@ -64,10 +68,11 @@ const Game = () => {
   return (
     <div class='game-container'>
 
+      <GameDescribe game={game()} />
       <RenderGame game={game()} />
 
       <form class='game-form' onSubmit={makeAction}>
-        {error && <p>{error}</p>}
+        {error && <p class='error'>{error}</p>}
         <input class='game-input' type='text' id='action' maxLength='1' autofocus />
         <button class='game-btn' type='submit'>Submit</button>
       </form>

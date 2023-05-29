@@ -18,8 +18,8 @@ public class Position {
 
     int border = Constants.getGameboardRowCol(game);
 
-    return (position.getRow() >= 0 && position.getRow() < border)
-        && (position.getCol() >= 0 && position.getCol() < border);
+    return (position.row >= 0 && position.row < border)
+        && (position.col >= 0 && position.col < border);
   }
 
   public static boolean arePositionsInlineAndAround(Position positionOne, Position positionTwo) {
@@ -51,23 +51,13 @@ public class Position {
 
     byte border = (byte) (Constants.getGameboardRowCol(game) - 1);
 
-    if (position.getRow() < 0) {
-      return new Position(border, position.getCol());
-    }
+    byte row = position.row;
+    byte col = position.col;
 
-    if (position.getRow() > border) {
-      return new Position(0, position.getCol());
-    }
+    row = (row < 0) ? border : (row > border) ? 0 : row;
+    col = (col < 0) ? border : (col > border) ? 0 : col;
 
-    if (position.getCol() < 0) {
-      return new Position(position.getRow(), border);
-    }
-
-    if (position.getCol() > border) {
-      return new Position(position.getRow(), 0);
-    }
-
-    throw new IllegalArgumentException("Out of border position isn't for modifying!");
+    return new Position(row, col);
   }
 
   @Override

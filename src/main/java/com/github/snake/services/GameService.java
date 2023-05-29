@@ -48,4 +48,16 @@ public class GameService {
     Game game = gameRepository.findById(gameId);
     return gamePlayService.getGameboard(game);
   }
+
+  public boolean isGrowthFoodActive(Long gameId) {
+    return gamePlayService.isGrowthFoodActive(gameId);
+  }
+
+  public boolean isBorderFoodActive(Long gameId) {
+    return gamePlayService.isBorderFoodActive(gameId);
+  }
+
+  public boolean isImmunityFoodActive(Long gameId) {
+    return gamePlayService.isImmunityFoodActive(gameId);
+  }
 }

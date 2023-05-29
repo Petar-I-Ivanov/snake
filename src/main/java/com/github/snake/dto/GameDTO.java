@@ -10,4 +10,8 @@ public class GameDTO {
   private GameStatusEnum status;
   private short turn;
   private String[][] map;
+
+  private boolean isBorderActive;
+  private boolean isGrowthActive;
+  private boolean isImmunityActive;
 }
