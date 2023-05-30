@@ -6,6 +6,7 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
+    "build-prod": "vite build --outDir ../../../target/classes/META-INF/resources",
     "serve": "vite preview"
   },
   "license": "MIT",
