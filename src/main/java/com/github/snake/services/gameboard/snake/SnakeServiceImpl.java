@@ -87,7 +87,7 @@ public class SnakeServiceImpl implements SnakeService {
 
     for (Position position : getPositionsToCheckForTrapped(head.getLocation())) {
 
-      if (!isPositionUnavailableToMove(game, position)) {
+      if (!isPositionUnavailableToMove(game, head, position)) {
         return false;
       }
     }
@@ -95,11 +95,17 @@ public class SnakeServiceImpl implements SnakeService {
     return true;
   }
 
-  private boolean isPositionUnavailableToMove(Game game, Position position) {
+  private boolean isPositionUnavailableToMove(Game game, SnakeHead head, Position position) {
 
-    return !Position.isPositionInBorders(game, position)
+    return isPositionOutOfBorderAndBorderFoodUnactive(game, head, position)
         || positionService.isPositionBarrier(game.getId(), position)
         || positionService.isPositionSnakeBody(game.getId(), position);
+  }
+
+  private boolean isPositionOutOfBorderAndBorderFoodUnactive(Game game, SnakeHead head,
+      Position position) {
+
+    return !Position.isPositionInBorders(game, position) && !head.isBorderFoodActive();
   }
 
   private static List<Position> getPositionsToCheckForTrapped(Position snakePosition) {
