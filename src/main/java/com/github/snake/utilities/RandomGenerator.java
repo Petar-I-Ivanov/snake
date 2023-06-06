@@ -50,7 +50,6 @@ public class RandomGenerator {
   public static Position randomPositionInBorders(Game game) {
 
     byte border = Constants.getGameboardRowCol(game);
-
     return new Position(randomInt(border), randomInt(border));
   }
 }

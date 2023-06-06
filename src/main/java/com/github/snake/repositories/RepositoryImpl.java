@@ -88,9 +88,13 @@ public class RepositoryImpl implements Repository {
 
     try {
       return query.getSingleResult();
-    } catch (NoResultException e) {
+    }
+
+    catch (NoResultException e) {
       return null;
-    } catch (NonUniqueResultException e) {
+    }
+
+    catch (NonUniqueResultException e) {
       throw new IllegalArgumentException(
           "Returned entity of type " + entityClass.getName() + " should be single or none.");
     }
@@ -112,9 +116,13 @@ public class RepositoryImpl implements Repository {
 
     try {
       return query.getSingleResult();
-    } catch (NoResultException e) {
+    }
+
+    catch (NoResultException e) {
       return null;
-    } catch (NonUniqueResultException e) {
+    }
+
+    catch (NonUniqueResultException e) {
       throw new IllegalArgumentException("Returned entity should be single or none.");
     }
   }

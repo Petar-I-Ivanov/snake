@@ -4,8 +4,6 @@ import com.github.snake.models.Game;
 
 public class Constants {
 
-  private Constants() {}
-
   public static final byte LEVEL_ONE_ROW_COL = 5;
   public static final byte LEVEL_TWO_ROW_COL = 7;
   public static final byte LEVEL_THREE_ROW_COL = 9;
@@ -37,6 +35,8 @@ public class Constants {
   public static final char RIGHT_MOVE = 'd';
   public static final char BACK_MOVE = 's';
   public static final char LEFT_MOVE = 'a';
+
+  private Constants() {}
 
   public static byte getGameboardRowCol(Game game) {
 
