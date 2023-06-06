@@ -1,20 +1,15 @@
 package com.github.snake.repositories;
 
-import com.github.snake.models.gameboard.Barrier;
-import com.github.snake.models.gameboard.Exit;
 import com.github.snake.models.gameboard.GameboardObject;
-import com.github.snake.models.gameboard.enemy.Enemy;
-import com.github.snake.models.gameboard.foods.normal.NormalFood;
-import com.github.snake.models.gameboard.foods.special.SpecialFood;
-import com.github.snake.models.gameboard.snake.SnakeBody;
-import com.github.snake.models.gameboard.snake.SnakeHead;
 import com.github.snake.utilities.Position;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.Inheritance;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
 import jakarta.persistence.TypedQuery;
-import java.util.Arrays;
+import jakarta.persistence.metamodel.EntityType;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -27,18 +22,16 @@ public class RepositoryImpl implements Repository {
 
   /**
    * This list keeps every @Entity's class that extends GameboardObject (is part from the
-   * gameboard). If new entity is added or removed should be fixed manually. Used to loop gameboard
-   * entities for the common methods (like when generating the gameboard we need all the entities
-   * from the same gameId or when checking if specific location is already taken)
+   * gameboard).Used to loop gameboard entities for the common methods (like when generating the
+   * gameboard we need all the entities from the same gameId or when checking if specific location
+   * is already taken)
    */
-  private static final List<Class<? extends GameboardObject>> ENTITY_CLASSES =
-      Arrays.asList(SnakeHead.class, SnakeBody.class, Exit.class, Barrier.class, NormalFood.class,
-          SpecialFood.class, Enemy.class);
-
+  private List<Class<? extends GameboardObject>> entityClasses;
   private EntityManager entityManager;
 
   public RepositoryImpl(EntityManager entityManager) {
     this.entityManager = entityManager;
+    this.entityClasses = extractEntityClasses();
   }
 
   /**
@@ -53,7 +46,7 @@ public class RepositoryImpl implements Repository {
   @Override
   public GameboardObject findAnyByGameIdAndPosition(Long gameId, Position position) {
 
-    return ENTITY_CLASSES.stream()
+    return entityClasses.stream()
         .map(classType -> findByGameIdAndPosition(gameId, position, classType))
         .filter(Objects::nonNull).findFirst().orElse(null);
   }
@@ -68,8 +61,7 @@ public class RepositoryImpl implements Repository {
   @Override
   public List<GameboardObject> findAllByGameId(Long gameId) {
 
-    return ENTITY_CLASSES.stream()
-        .flatMap(classType -> findListByGameId(gameId, classType).stream())
+    return entityClasses.stream().flatMap(classType -> findListByGameId(gameId, classType).stream())
         .collect(Collectors.toList());
   }
 
@@ -166,5 +158,34 @@ public class RepositoryImpl implements Repository {
   @Override
   public <T extends GameboardObject> void delete(T entity) {
     entityManager.remove(entityManager.find(entity.getClass(), entity.getId()));
+  }
+
+  /**
+   * checks entityManager's metamodel entities to find the ones part from the gameboard and find
+   * their Class
+   * 
+   * @return Entity classes part from the Gameboard
+   */
+  private List<Class<? extends GameboardObject>> extractEntityClasses() {
+
+    return entityManager.getMetamodel().getEntities().stream().map(EntityType::getJavaType)
+        .filter(this::isGameboardObject)
+        .map(entityClass -> (Class<? extends GameboardObject>) entityClass)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * @param entityClass represents the entity class
+   * @return true if the class is annotated with entity, not annotated with Inheritance (because
+   *         like NormalFood matches the requirements but is only used to map the
+   *         subclasses @OneToOne with Game and store them in single table) and is subclass of
+   *         GameboardObject
+   * @returns false otherwise
+   */
+  private boolean isGameboardObject(Class<?> entityClass) {
+
+    return entityClass.isAnnotationPresent(Entity.class)
+        && !entityClass.isAnnotationPresent(Inheritance.class)
+        && GameboardObject.class.isAssignableFrom(entityClass);
   }
 }
