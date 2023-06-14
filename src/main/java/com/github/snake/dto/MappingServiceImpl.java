@@ -1,6 +1,6 @@
 package com.github.snake.dto;
 
-import com.github.snake.api.encoder.IdEncoder;
+import com.github.snake.encoder.IdEncoder;
 import com.github.snake.models.Game;
 import com.github.snake.models.GameStatusEnum;
 import com.github.snake.services.interfaces.GamePlayService;

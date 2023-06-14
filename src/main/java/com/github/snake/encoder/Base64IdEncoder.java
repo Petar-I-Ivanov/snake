@@ -1,4 +1,4 @@
-package com.github.snake.api.encoder;
+package com.github.snake.encoder;
 
 import jakarta.inject.Singleton;
 import java.math.BigInteger;

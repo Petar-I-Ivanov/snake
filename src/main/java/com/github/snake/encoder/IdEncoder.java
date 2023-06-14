@@ -1,4 +1,4 @@
-package com.github.snake.api.encoder;
+package com.github.snake.encoder;
 
 public interface IdEncoder {
 
